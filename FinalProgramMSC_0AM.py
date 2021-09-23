@@ -2972,7 +2972,7 @@ def mysql_to_excel(Client,file_name):
 
     # Save Excel File
     writer.save()
-
+    '''
     fromaddr = 'jkt@autodkm.com'
     
     #recipients = "oktoberlin@gmai.com"
@@ -3042,7 +3042,7 @@ def mysql_to_excel(Client,file_name):
             print ("Check all the addresses in the TO, CC and BCC field. There should be an error or a misspelling somewhere.")
         else:
             print (error_code+": "+error_message)
-    
+    '''
 if __name__ == '__main__':
     time_now_filename = datetime.now(pytz.timezone('Asia/Jakarta')).strftime("%Y%m%d")
     Client = 'MSC'
