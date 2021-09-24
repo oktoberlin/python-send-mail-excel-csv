@@ -1,15 +1,16 @@
-from sources.time import time_yesterday, time_now
+import logging
+from pandas.io import sql
+from sources.excel.time import time_yesterday, time_now,time_now_filename
 
 time_from = time_yesterday                                  
 
-#if f'{time_now_email_subject} 16:00:01' <= time_now <= f'{time_now_email_subject} 00:00:01':
-#  time_from = time_yesterday
-print("Enjoy your life...")
-print(f'{time_from}-{time_now}')
+logging.basicConfig(filename=f'logs/excel/excel_{time_now_filename}.log',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
+logging.info("Export Excel Begin")
+logging.info(f'Date Range Request: {time_from}-{time_now}')
 
 Principle_Code = 'MSC'
 
-sql1 = """
+sql_dailyRecap = """
 SELECT * FROM 
 (SELECT 
 (SELECT COUNT(*) FROM ContainerStock CS 
@@ -1713,7 +1714,7 @@ AND EI.DateIn <= '"""+time_now+"""'
 ) AS L1
 """
 
-sql2 = """Select 
+sql_stockList = """Select 
 CS.ContNo as 'Container No',
 CD.Size as 'Size',
 CD.Type as 'Type',
@@ -1741,7 +1742,7 @@ AND EI.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN)
 AND EI.DateIn <= '"""+time_now+"""'  
 GROUP BY CS.ContNo order by EI.DateIn"""
 
-sql2_summary = """
+sql_stockList_summary = """
 SELECT 
 COUNT(CASE WHEN CS.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
 COUNT(CASE WHEN CS.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
@@ -1923,7 +1924,7 @@ AND EI.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN)
 AND EI.DateIn <= '"""+time_now+"""'  
 """
 
-sql3 = """Select EIRIN.ContNo,ContainerDetails.size,ContainerDetails.type,contCondition,
+sql_mov_in = """Select EIRIN.ContNo,ContainerDetails.size,ContainerDetails.type,contCondition,
 cleaningtype.Name,LEFT(ContainerDetails.Payload,5),If(Net=0,Null,Net),If(length(Datemnf) < 3,' ',Datemnf),EIRIN.DATEOUTPORT,
 EIRIN.DateIn,Concat(Exvessel,'-',ExVoy),UPPER(interchange.Consignee),
 EIRIN.VN,EIRIN.IntNo,EIRIN.PrincipleCode,EIRIN.Grade,EIRIN.Remark 
@@ -1941,7 +1942,7 @@ where EIRIN.PrincipleCode = '"""+Principle_Code+"""'
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 GROUP BY EIRIN.NOMOR order by EIRIN.DateIn"""
 
-sql3_summary = """
+sql_mov_in_summary = """
 SELECT 
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' THEN 1 END) AS AV,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
@@ -2073,8 +2074,8 @@ AND EIRIN.PrincipleCode = '"""+Principle_Code+"""'
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 """
 
-sql4 = """Select EIROUT.ContNo as 'Container No',ContainerDetails.Size,ContainerDetails.Type,
-EIRIN.DateIn as 'Date In',LEFT(ContainerDetails.Payload,5),ContainerDetails.Net as 'Tare',ContainerDetails.Datemnf as 'DMF',
+sql_mov_out = """Select EIROUT.ContNo as 'Container No',ContainerDetails.Size,ContainerDetails.Type,
+EIRIN.DateIn as 'Date In',LEFT(ContainerDetails.Payload,5) as Payload,ContainerDetails.Net as 'Tare',ContainerDetails.Datemnf as 'DMF',
 EIROUT.Nomor as 'EIR Out',Concat(ExVessel,'-',ExVoy) as 'Ex Vessel-Voy',BookingNo as 'DO No.',DateOut as 'Date Out',
 Concat(Vessel,'-',Voy) as 'Vessel-Voy',Destination,Shipper,EIROUT.VN as 'Truck No',
 EIROUT.ContCondition as 'Condition',EIROUT.Seal as 'Seal No.',EIROUT.PrincipleCode as Principal,EIROUT.Remark as 'Remarks' 
@@ -2087,7 +2088,7 @@ where EIROUT.PrincipleCode = '"""+Principle_Code+"""'
 AND EIROUT.DateOut >= '"""+time_from+"""' AND EIROUT.DateOut <= '"""+time_now+"""' 
 group by EIROUT.ContNo,BookingNo order by EIROUT.DateOut"""
 
-sql4_summary = """
+sql_mov_out_summary = """
 SELECT 
 COUNT(CASE WHEN EIROUT.contCondition LIKE 'AV%' THEN 1 END) AS AV,
 COUNT(CASE WHEN EIROUT.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
@@ -2211,353 +2212,4 @@ FROM EIROUT
 left Join EIRIN On EIRIN.Nomor = EIROut.EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIROUT.ContNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'HT' AND EIROUT.PrincipleCode = '"""+Principle_Code+"""' AND EIROUT.DateOut >= '"""+time_from+"""' AND EIROUT.DateOut <= '"""+time_now+"""' 
-"""
-
-sql5 = """Select 
-ContainerStock.ContNo as 'Container No',ContainerDetails.Size as 'Size',ContainerDetails.Type as 'Type',
-ContainerStock.ContCondition as 'Condition',LEFT(ContainerDetails.Payload,5) as 'Payload',
-If(ContainerDetails.Net=0,Null,Net) as 'Tare',If(length(ContainerDetails.Datemnf) < 3,' ',
-ContainerDetails.Datemnf) as 'Date Mnf',Concat(Interchange.Exvessel,'-',Interchange.ExVoy) as 'Ex Vessel Voy',
-UPPER(Interchange.Consignee) as 'Customer',EIRIN.DateIn as 'Date IN',ContainerStock.PrincipleCode as Principle,
-BlockContainer.Remark as 'Remarks IN',EIRIN.Grade as Grade,EIRIN.IntNo as 'B/L NO' 
-From ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join BlockContainer On BlockContainer.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-left Join Interchange On Interchange.Nomor = ContainerStock.IntNo 
-left Join InterchangeContainer On InterchangeContainer.Nomor = ContainerStock.IntNo AND 
-InterchangeContainer.ContNo = ContainerStock.ContNo 
-left Join interchangeDocpaycontainer on InterchangeDocpaycontainer.ContNo = ContainerStock.ContNo 
-AND InterchangeDocpaycontainer.IntNo = ContainerStock.IntNo 
-left Join interchangeDocpaydetails on InterchangeDocpaydetails.Nomor = InterchangeDocpaycontainer.Nomor 
-AND InterchangeDocpaydetails.Size = ContainerDetails.Size 
-where ContainerStock.PrincipleCode = '"""+Principle_Code+"""' AND ContainerStock.ContCondition = 'DMG' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-GROUP BY ContainerStock.ContNo order by EIRIN.DateIn"""
-
-sql5_summary = """
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '20' AND ContainerDetails.type = 'GP' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '20' AND ContainerDetails.type = 'HC' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '20' AND ContainerDetails.type = 'OT' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '20' AND ContainerDetails.type = 'FR' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '20' AND ContainerDetails.type = 'RF' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '20' AND ContainerDetails.type = 'TK' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '40' AND ContainerDetails.type = 'GP' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '40' AND ContainerDetails.type = 'HC' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '40' AND ContainerDetails.type = 'OT' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'   
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '40' AND ContainerDetails.type = 'FR' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '40' AND ContainerDetails.type = 'RF' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '40' AND ContainerDetails.type = 'RH' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-where ContainerDetails.size = '40' AND ContainerDetails.type = 'HT' AND ContainerStock.ContCondition = 'DMG' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-"""
-
-sql6 = """Select 
-ContainerStock.ContNo as 'Container No',ContainerDetails.Size as 'Size',ContainerDetails.Type as 'Type',
-ContainerStock.ContCondition as 'Condition',LEFT(ContainerDetails.Payload,5) as 'Payload',
-If(ContainerDetails.Net=0,Null,Net) as 'Tare',If(length(ContainerDetails.Datemnf) < 3,' ',
-ContainerDetails.Datemnf) as 'Date Mnf',Concat(Interchange.Exvessel,'-',Interchange.ExVoy) as 'Ex Vessel Voy',
-UPPER(Interchange.Consignee) as 'Customer',EIRIN.DateIn as 'Date IN',
-RepairContainer.CompleteRepair as 'Completed Repair',ContainerStock.PrincipleCode as Principle,
-RepairContainer.Repaired,BlockContainer.Remark as 'Remarks IN',EIRIN.Grade as Grade,EIRIN.IntNo as 'B/L NO' 
-From ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join BlockContainer On BlockContainer.ContNo = ContainerStock.ContNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-left Join Interchange On Interchange.Nomor = ContainerStock.IntNo 
-left Join InterchangeContainer On InterchangeContainer.Nomor = ContainerStock.IntNo AND 
-InterchangeContainer.ContNo = ContainerStock.ContNo 
-left Join interchangeDocpaycontainer on InterchangeDocpaycontainer.ContNo = ContainerStock.ContNo 
-AND InterchangeDocpaycontainer.IntNo = ContainerStock.IntNo 
-left Join interchangeDocpaydetails on InterchangeDocpaydetails.Nomor = InterchangeDocpaycontainer.Nomor 
-AND InterchangeDocpaydetails.Size = ContainerDetails.Size 
-where ContainerStock.PrincipleCode = '"""+Principle_Code+"""' AND RepairContainer.Repaired = 'Yes' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-GROUP BY ContainerStock.ContNo order by EIRIN.DateIn"""
-
-sql6_summary = """
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '20' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'GP' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '20' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'HC' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '20' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'OT' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '20' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'FR' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '20' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'RF' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '20' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'TK' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '40' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'GP' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '40' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'HC' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '40' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'OT' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'   
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '40' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'FR' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '40' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'RF' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '40' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'RH' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
-UNION ALL 
-SELECT 
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' THEN 1 END) AS AV,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS DMG,
-COUNT(CASE WHEN ContainerStock.ContCondition LIKE 'AV%' OR ContainerStock.ContCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
-FROM ContainerStock 
-    Left join ContainerDetails On ContainerDetails.ContNo = ContainerStock.ContNo 
-Left Join EIRIN On EIRIN.Nomor = ContainerStock.EIRNo 
-Left Join RepairContainer On RepairContainer.EORNo = ContainerStock.EORNo 
-where ContainerDetails.size = '40' AND RepairContainer.Repaired = 'Yes' AND ContainerDetails.type = 'HT' 
-AND ContainerStock.PrincipleCode = '"""+Principle_Code+"""' 
-AND EIRIN.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN) AND EIRIN.DateIn <= '"""+time_now+"""'  
 """

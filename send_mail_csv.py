@@ -1,15 +1,13 @@
-import pandas as pd
-import xlsxwriter
 import smtplib
 from smtplib import *
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from sources.time import time_now, time_now_email_subject
-from sources.csv_format import *
+from sources.csv.time import time_now, time_now_email_subject
+from sources.csv.csv_format import *
 
-def mysql_to_excel():
+def mysql_to_csv():
     fromaddr = "report@autodkms.com"
     
     #recipients = "oktoberlin@gmai.com"
@@ -46,7 +44,7 @@ def mysql_to_excel():
     part = MIMEBase('application','octet-stream')
     part.set_payload((attachment).read())
     encoders.encode_base64(part)
-    part.add_header('Content-Disposition', "attachment; filename= %s" % file_name)
+    part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
 
     msg.attach(part)
     try:
@@ -82,5 +80,4 @@ def mysql_to_excel():
             print (error_code+": "+error_message)
         
 
-if __name__ == '__main__':
-    mysql_to_excel()
+if __name__ == '__main__':mysql_to_csv()
