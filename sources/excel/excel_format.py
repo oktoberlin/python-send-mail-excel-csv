@@ -16,11 +16,17 @@ writer = pd.ExcelWriter(excel_filename, engine='xlsxwriter')
 
 # Formatting Excel File
 workbook = writer.book
-
+for i in range(len(workbook.formats)):
+    workbook.formats[i].set_font_size(10)
+    workbook.formats[i].set_font_name('Arial Narrow')
+'''
 fmt=workbook.add_format({
-    "font_name": "Arial Narrow",
-    "font_size":10
+    'font_name':'Arial Narrow',
+    'font_size':10
 })
+'''
+#fmt.set_font_size(10)
+#fmt.set_font_name('Arial Narrow')
 
 #cell_format.set_font_name('Arial Narrow')
 #cell_format.set_font_size(10)
@@ -50,13 +56,15 @@ merge_format_number = workbook.add_format({
 align_center = workbook.add_format({
     'align': 'center'
 })
+align_left = workbook.add_format()
+align_left.set_align('left')
+align_left.set_align('vcenter')
 
 font_size_title = workbook.add_format({
     'font_size':12,
     'bold':True,
     'align':'center',
 })
-font_size_title.set_underline(1)
 
 
 # SHEET MOV IN #
@@ -64,35 +72,54 @@ df_mov_in = pd.read_sql_query(sql_mov_in, db)
 df_mov_in.index += 1 #Add index by 1
 
 header_mov_in = [
-"Container No","Size","Type","Condition","Cleaning","Payload","Tare","Date Mnf",
+"Container No","Size","Type","CD","Cleaning","Payload","Tare","Date Mnf",
 "GateOut_CY","Date In","Ex Vessel Voy","Ex Consignee","Truck No",
 "B/L NO","Principal","Grade","Remarks"
 ]
 
-df_mov_in.to_excel(writer, sheet_name='MOV IN', startrow=4, header=header_mov_in)
+df_mov_in.to_excel(writer, sheet_name='MOVE IN', startrow=13, header=header_mov_in)
 df_mov_in_summary = pd.read_sql_query(sql_mov_in_summary, db)
 index=["20GP","20HC","20OT","20FR","20RF","20TK","40GP","40HC","40OT","40FR","40RF","40RH","40HT"]
 df_mov_in_summary.index = index
-df_mov_in_summary.to_excel(writer, sheet_name='MOV IN', startrow=df_mov_in.shape[0] + 7,startcol=0)
-worksheet_mov_in = writer.sheets['MOV IN']
+df_mov_in_summary.to_excel(writer, sheet_name='MOVE IN', startrow=df_mov_in.shape[0] + 17,startcol=1)
+worksheet_mov_in = writer.sheets['MOVE IN']
+worksheet_mov_in.set_tab_color('#C00000')
+#worksheet_mov_in.set_column('A:Z', None, fmt)
+#worksheet_mov_in.set_row(0, None, fmt)
+worksheet_mov_in.set_default_row(12.75)
 
 isempty = df_mov_in.empty
 if isempty!=False:
     # WORKSHEET 3 FORMAT
-    worksheet_mov_in.set_row(0, 26.25)
+    #worksheet_mov_in.set_row(0, 26.25)
     
-    # Merge necessary column
-    worksheet_mov_in.merge_range('A1:O1', 'MOVEMENT IN CONTAINER LIST', font_size_title)
-    worksheet_mov_in.merge_range('A3:E3', f'PRINCIPAL: {Principle_Code}', merge_info)
-    worksheet_mov_in.merge_range('A4:E4', f'{time_now}', merge_info)
+   
 
     # Add Border
     #border_fmt = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
     #worksheet_stock_list.set_column(0,len(df_stock_list.columns),15,border_fmt)
     
-    # Add Number Iteration
-    worksheet_mov_in.write('A5:A5', 'No.', merge_format_number)
+    # Header Info
+    worksheet_mov_in.set_column('B1:F1', 'PT. CITRA PRIMA CONTAINER', align_left)
+    worksheet_mov_in.set_column(
+        'B2:H4', 
+        'JL. YOS SUDARSO NO. 16 KEL. WAY LUNIK KEC. PANJANG BANDAR LAMPUNG, PROVINSI : LAMPUNG', 
+        align_left
+    )
+    worksheet_mov_in.set_column('B5:F5', 'Phone : 62-721-3400050', align_left)
+    worksheet_mov_in.set_column('B6:F6', 'Fax : 62-721-3400051', align_left)
+    worksheet_mov_in.write(
+        'B9:B9', 
+        f'Principal: {Principle_Code}PNJ MEDITERRANEAN SHIPPING COMPANY', 
+        merge_info
+    )
+    worksheet_mov_in.write('B11:B11', f'Date : {time_now}', merge_info)
 
+    # Add Number Iteration
+    worksheet_mov_in.write('A14:A14', 'No.', merge_format_number)
+     # Merge necessary column
+    worksheet_mov_in.merge_range('A7:Q7', 'Depot In Container List (Consignee Return)', font_size_title)
+    
     worksheet_mov_in.set_column('A:O', 10, align_center)
     worksheet_mov_in.set_column(0, 0, 5)
     worksheet_mov_in.set_column(1, 1, 20)
@@ -102,23 +129,42 @@ if isempty!=False:
     worksheet_mov_in.set_column(11, 11, 20)
     worksheet_mov_in.set_column(12, 12, 20)
 else:
-    worksheet_mov_in.set_row(0, 26.25)
+    # Format column Text Align
+    worksheet_mov_in.set_column('B:T', None, align_center) 
+    
+    # Add Border
+    #border_fmt = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
+    #worksheet_stock_list.set_column(0,len(df_stock_list.columns),15,border_fmt)
+    
+    # Header Info
+    worksheet_mov_in.merge_range('B1:F1', 'PT. CITRA PRIMA CONTAINER', align_left)
+    worksheet_mov_in.merge_range(
+        'B2:H4', 
+        'JL. YOS SUDARSO NO. 16 KEL. WAY LUNIK KEC. PANJANG BANDAR LAMPUNG, PROVINSI : LAMPUNG', 
+        align_left
+    )
+    worksheet_mov_in.merge_range('B5:F5', 'Phone : 62-721-3400050', align_left)
+    worksheet_mov_in.merge_range('B6:F6', 'Fax : 62-721-3400051', align_left)
+    worksheet_mov_in.write(
+        'B9:B9', 
+        f'Principal: {Principle_Code}PNJ MEDITERRANEAN SHIPPING COMPANY', 
+        merge_info
+    )
+    worksheet_mov_in.write('B11:B11', f'Date : {time_now}', merge_info)
 
-    # Merge necessary column
-    worksheet_mov_in.merge_range('A1:L1', 'MOVEMENT IN CONTAINER LIST', font_size_title)
-    worksheet_mov_in.merge_range('A3:E3', f'PRINCIPAL: {Principle_Code}', merge_info)
-    worksheet_mov_in.merge_range('A4:E4', f'{time_now}', merge_info)
+    # Add Number Iteration
+    worksheet_mov_in.write('A14:A14', 'No.', merge_format_number)
+     # Merge necessary column
+    worksheet_mov_in.merge_range('A7:Q7', 'Depot In Container List (Consignee Return)', font_size_title)
     
     # Add Border
     #border_fmt = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
     #worksheet_mov_in.set_column(0,len(df3.columns),15,border_fmt)
 
-    # Add Number Iteration
-    worksheet_mov_in.write('A5:A5', 'No.', merge_format_number)
 
     # Format column Text Align
-    worksheet_mov_in.set_column('B:L', None, align_center) 
-    worksheet_mov_in.set_column('N:Q', None, align_center)
+    worksheet_mov_in.set_column('B:T', None, align_center) 
+    #worksheet_mov_in.set_column('N:Q', None, align_center)
     
     # Auto-adjust column width
     for idx, col in enumerate(df_mov_in.columns):  # loop through all columns
@@ -131,13 +177,15 @@ else:
 
     # Format Column width
     worksheet_mov_in.set_column(0, 0, 5)
+    worksheet_mov_in.set_column(4, 4, 5)
+    worksheet_mov_in.set_column(6, 6, 10)
     worksheet_mov_in.set_column(7, 7, 10)
     worksheet_mov_in.set_column(8, 8, 10)
-    worksheet_mov_in.set_column(10, 10, 20)
-
+    #worksheet_mov_in.set_column(7, 7, 20)
+    
     # Un-bold the number iteration
     for row_num, value in enumerate(df_mov_in.index.get_level_values(level=0)):
-        worksheet_mov_in.write(row_num+5, 0, value, column_number_format)
+        worksheet_mov_in.write(row_num+14, 0, value, column_number_format)
     
     # Add Border
     #border_fmt = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
@@ -153,7 +201,7 @@ header_repo_in = [
 "B/L NO","Principal","Grade","Remarks"
 ]
 
-df_repo_in.to_excel(writer, sheet_name='MOV IN', startrow=4, header=header_repo_in)
+df_repo_in.to_excel(writer, sheet_name='REPO IN', startrow=4, header=header_repo_in)
 df_repo_in_summary = pd.read_sql_query(sql_mov_in_summary, db)
 index=["20GP","20HC","20OT","20FR","20RF","20TK","40GP","40HC","40OT","40FR","40RF","40RH","40HT"]
 df_repo_in_summary.index = index
@@ -231,12 +279,13 @@ else:
 df_mov_out = pd.read_sql_query(sql_mov_out, db)
 df_mov_out.index += 1 #Add index by 1
 
-df_mov_out.to_excel(writer, sheet_name='MOV OUT', startrow=4)
+df_mov_out.to_excel(writer, sheet_name='MOVE OUT', startrow=4)
 df_mov_out_summary = pd.read_sql_query(sql_mov_out_summary, db)
 index=["20GP","20HC","20OT","20FR","20RF","20TK","40GP","40HC","40OT","40FR","40RF","40RH","40HT"]
 df_mov_out_summary.index = index
-df_mov_out_summary.to_excel(writer, sheet_name='MOV OUT', startrow=df_mov_out.shape[0] + 7,startcol=0)
-worksheet_mov_out = writer.sheets['MOV OUT']
+df_mov_out_summary.to_excel(writer, sheet_name='MOVE OUT', startrow=df_mov_out.shape[0] + 7,startcol=0)
+worksheet_mov_out = writer.sheets['MOVE OUT']
+worksheet_mov_out.set_tab_color('yellow')
 
 isempty = df_mov_out.empty
 if isempty!=False:
@@ -310,7 +359,7 @@ df_repo_out.to_excel(writer, sheet_name='REPO OUT', startrow=4)
 df_repo_out_summary = pd.read_sql_query(sql_mov_out_summary, db)
 index=["20GP","20HC","20OT","20FR","20RF","20TK","40GP","40HC","40OT","40FR","40RF","40RH","40HT"]
 df_repo_out_summary.index = index
-df_repo_out_summary.to_excel(writer, sheet_name='MOV OUT', startrow=df_repo_out.shape[0] + 7,startcol=0)
+df_repo_out_summary.to_excel(writer, sheet_name='REPO OUT', startrow=df_repo_out.shape[0] + 7,startcol=0)
 worksheet_repo_out = writer.sheets['REPO OUT']
 
 isempty = df_repo_out.empty
@@ -389,6 +438,7 @@ df_stock_list_summary.index = index
 df_stock_list_summary.to_excel(writer, sheet_name='STOCK LIST', startrow=df_stock_list.shape[0] + 7,startcol=0)
 
 worksheet_stock_list = writer.sheets['STOCK LIST']
+worksheet_stock_list.set_tab_color('green')
 
 isempty = df_stock_list.empty
 if isempty!=False:
@@ -464,6 +514,7 @@ df_dailyRecap.index += 1 #Add index by 1
 df_dailyRecap.to_excel(writer, sheet_name='DAILY RECAP', startrow=8, header=False, index=False, startcol=1)
 
 worksheet_dailyRecap = writer.sheets['DAILY RECAP']
+worksheet_dailyRecap.set_tab_color('#00B0F0')
 
 worksheet_dailyRecap.set_column(0, 0, 10)
 worksheet_dailyRecap.set_row(0, 26.25)
@@ -570,8 +621,8 @@ worksheet_dailyRecap.conditional_format( 'A1:AK4' , { 'type' : 'no_errors' , 'fo
 
 border_format = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
 worksheet_dailyRecap.conditional_format( 'A5:AK16' , { 'type' : 'no_errors' , 'format' : border_format} )
-worksheet_dailyRecap.set_column('A:Z', None, fmt)
-worksheet_dailyRecap.set_row(0, None, fmt)
+#worksheet_dailyRecap.set_column('A:Z', None, fmt)
+#worksheet_dailyRecap.set_row(0, None, fmt)
 
 # Save Excel File
 writer.save()

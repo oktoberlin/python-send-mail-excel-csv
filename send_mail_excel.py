@@ -9,6 +9,7 @@ from sources.excel.excel_format import *
 import logging
 
 def mysql_to_excel():
+    '''
     logging.info('ready to send mail')
     fromaddr = "report@autodkms.com"
     toaddr=['oktoberlin@gmail.com']
@@ -66,6 +67,6 @@ def mysql_to_excel():
         else:
             logging.warning(error_code+": "+error_message)
         
-    
+    '''
 
 if __name__ == '__main__':mysql_to_excel()

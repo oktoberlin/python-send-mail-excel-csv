@@ -1924,7 +1924,7 @@ AND EI.DateIn >= (SELECT MIN(EIRIN.DateIn) FROM EIRIN)
 AND EI.DateIn <= '"""+time_now+"""'  
 """
 
-sql_mov_in = """Select EIRIN.ContNo,ContainerDetails.size,ContainerDetails.type,contCondition,
+sql_mov_in = """Select EIRIN.ContNo,ContainerDetails.size,ContainerDetails.type,LEFT(contCondition,2),
 cleaningtype.Name,LEFT(ContainerDetails.Payload,5),If(Net=0,Null,Net),If(length(Datemnf) < 3,' ',Datemnf),EIRIN.DATEOUTPORT,
 EIRIN.DateIn,Concat(Exvessel,'-',ExVoy),UPPER(interchange.Consignee),
 EIRIN.VN,EIRIN.IntNo,EIRIN.PrincipleCode,EIRIN.Grade,EIRIN.Remark 
