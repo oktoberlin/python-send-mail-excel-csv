@@ -5,6 +5,7 @@ time_yesterday = (datetime.now(pytz.timezone('Asia/Jakarta'))-timedelta(1)).strf
 time_now = datetime.now(pytz.timezone('Asia/Jakarta')).strftime("%Y-%m-%d %H:%M:%S")
 time_now_email_subject = datetime.now(pytz.timezone('Asia/Jakarta')).strftime("%Y-%m-%d")
 time_now_filename = datetime.now(pytz.timezone('Asia/Jakarta')).strftime("%Y%m%d")
+date_now = datetime.now(pytz.timezone('Asia/Jakarta')).strftime("%Y/%m/%d")
 
 '''
 if time_now >= f'{time_now_email_subject} 23:39:01' and time_now <= f'{time_now_email_subject} 16:00:00':

@@ -2,7 +2,7 @@ import logging
 from pandas.io import sql
 from sources.excel.time import time_yesterday, time_now,time_now_filename
 
-time_from = time_yesterday                                  
+time_from = '2021-09-24 10:48:00'                                  
 
 logging.basicConfig(filename=f'logs/excel/excel_{time_now_filename}.log',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
 logging.info("Export Excel Begin")

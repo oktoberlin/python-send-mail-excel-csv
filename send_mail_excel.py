@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from sources.excel.time import time_now, time_now_email_subject
-from sources.excel.excel_format import *
+from sources.excel.save2 import *
 import logging
 
 def mysql_to_excel():

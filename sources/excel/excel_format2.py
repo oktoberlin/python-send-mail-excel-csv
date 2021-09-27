@@ -1,5 +1,5 @@
 import pandas as pd
-import xlsxwriter
+from openpyxl import Workbook
 from sources.excel.time import time_now_filename,date_now
 from sources.excel.queries import *
 from sources.database.database import db
@@ -12,7 +12,7 @@ file_name = f'REPORT-{Client}-{time_now_filename}.xlsx'
 excel_filename = f'excel-output/{file_name}'
 
 # Writing Database into Excel
-writer = pd.ExcelWriter(excel_filename, engine='xlsxwriter')
+writer = pd.ExcelWriter(excel_filename, engine='openpyxl')
 
 # Formatting Excel File
 workbook = writer.book
