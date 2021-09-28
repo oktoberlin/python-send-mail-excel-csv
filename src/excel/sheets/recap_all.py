@@ -113,7 +113,7 @@ worksheet_recapAll.write('W17:Y17', "45'", merge_info_center)
 worksheet_recapAll.write('Z17:AB17', "45'", merge_info_center)
 worksheet_recapAll.write('AC17:AE17', "45'", merge_info_center)
 '''
-worksheet_recapAll.write_formula('B17', '=SUM(C16+D16)*2+B16', None)
+worksheet_recapAll.merge_range('B17:D17', '=SUM(C16+D16)*2+B16', None)
 
 worksheet_recapAll.set_column('B:AK', None, align_center)
 
