@@ -24,7 +24,7 @@ writer = pd.ExcelWriter(excel_filename, engine='xlsxwriter')
 
 # Formatting Excel File
 workbook = writer.book
-
+workbook.set_calc_mode('auto')
 #workbook.formats[0].set_font_size(10)
 #workbook.formats[1].set_font_size(10)
 #workbook.formats[0].set_font_name('Arial Narrow')

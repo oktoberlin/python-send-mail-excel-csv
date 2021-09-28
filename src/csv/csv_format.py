@@ -1,7 +1,7 @@
 import pandas as pd
-from sources.csv.time import time_now_filename
-from sources.csv.queries import *
-from sources.database.database import db
+from src.csv.time import time_now_filename
+from src.csv.queries import *
+from src.database.database import db
 
 Client = 'MSC'
 # File name

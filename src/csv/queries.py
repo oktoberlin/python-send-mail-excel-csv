@@ -1,5 +1,5 @@
 import logging
-from sources.csv.time import time_yesterday, time_now, time_now_filename
+from src.csv.time import time_yesterday, time_now, time_now_filename
 
 time_from = time_yesterday                                  
 
