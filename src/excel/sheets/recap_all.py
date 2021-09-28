@@ -1,5 +1,5 @@
 from src.excel.excel_format import *
-from src.excel.query_sql.sql_recapAll import sql_recapAll
+from src.excel.query_sql.sql_recapAll import *
 
 # SHEET STOCK LIST #
 df_recapAll = pd.read_sql_query(sql_recapAll, db) #Read the sql query
@@ -7,6 +7,42 @@ df_recapAll.index += 1 #Add index by 1
 
 #df_stock_list.to_excel(writer, sheet_name='STOCK LIST', startrow=4)
 df_recapAll.to_excel(writer, sheet_name='RECAP ALL', startrow=8, header=False, index=False, startcol=1)
+
+df_recapAll_preStock = pd.read_sql_query(sql_recapAll_preStock, db)
+df_recapAll_preStock.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=1)
+
+df_recapAll_mov_in = pd.read_sql_query(sql_recapAll_move_in, db)
+df_recapAll_mov_in.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=4)
+
+df_recapAll_mov_in_avCondition = pd.read_sql_query(sql_recapAll_mov_in_avCondition, db)
+df_recapAll_mov_in_avCondition.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=7)
+
+df_recapAll_mov_in_dmgCondition = pd.read_sql_query(sql_recapAll_mov_in_dmgCondition, db)
+df_recapAll_mov_in_dmgCondition.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=10)
+
+df_recapAll_mov_in_dwCleaning = pd.read_sql_query(sql_recapAll_mov_in_dwCleaning, db)
+df_recapAll_mov_in_dwCleaning.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=13)
+
+df_recapAll_mov_in_wCleaning = pd.read_sql_query(sql_recapAll_mov_in_wCleaning, db)
+df_recapAll_mov_in_wCleaning.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=16)
+
+df_recapAll_mov_in_swCleaning = pd.read_sql_query(sql_recapAll_mov_in_swCleaning, db)
+df_recapAll_mov_in_swCleaning.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=19)
+
+df_recapAll_complete_repair = pd.read_sql_query(sql_recapAll_complete_repair, db)
+df_recapAll_complete_repair.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=22)
+
+df_recapAll_mov_out = pd.read_sql_query(sql_recapAll_mov_out, db)
+df_recapAll_mov_out.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=25)
+
+df_recapAll_stockList = pd.read_sql_query(sql_recapAll_stockList, db)
+df_recapAll_stockList.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=28)
+
+df_recapAll_avStockList = pd.read_sql_query(sql_recapAll_avStockList, db)
+df_recapAll_avStockList.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=31)
+
+df_recapAll_dmgStockList = pd.read_sql_query(sql_recapAll_dmgStockList, db)
+df_recapAll_dmgStockList.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=34)
 
 worksheet_recapAll = writer.sheets['RECAP ALL']
 worksheet_recapAll.set_tab_color('#7030A0')
@@ -113,7 +149,20 @@ worksheet_recapAll.write('W17:Y17', "45'", merge_info_center)
 worksheet_recapAll.write('Z17:AB17', "45'", merge_info_center)
 worksheet_recapAll.write('AC17:AE17', "45'", merge_info_center)
 '''
-worksheet_recapAll.merge_range('B17:D17', '=SUM(C16+D16)*2+B16', None)
+
+worksheet_recapAll.merge_range('B17:D17', df_recapAll_preStock.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('E17:G17', df_recapAll_mov_in.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('H17:J17', df_recapAll_mov_in_avCondition.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('K17:M17', df_recapAll_mov_in_dmgCondition.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('N17:P17', df_recapAll_mov_in_dwCleaning.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('Q17:S17', df_recapAll_mov_in_wCleaning.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('T17:V17', df_recapAll_mov_in_swCleaning.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('W17:Y17', df_recapAll_complete_repair.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('Z17:AB17', df_recapAll_mov_out.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('AC17:AE17', df_recapAll_stockList.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('AF17:AH17', df_recapAll_avStockList.iloc[0,0], merge_info_center)
+worksheet_recapAll.merge_range('AI17:AK17', df_recapAll_dmgStockList.iloc[0,0], merge_info_center)
+#worksheet_recapAll.merge_range('B17:D17', '=SUM(C16+D16)*2+B16', None)
 
 worksheet_recapAll.set_column('B:AK', None, align_center)
 

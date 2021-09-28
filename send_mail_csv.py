@@ -4,8 +4,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from sources.csv.time import time_now, time_now_email_subject
-from sources.csv.csv_format import *
+from src.csv.time import time_now, time_now_email_subject
+from src.csv.csv_format import *
 
 def mysql_to_csv():
     fromaddr = "report@autodkms.com"
