@@ -1,0 +1,120 @@
+from src.excel.excel_format import *
+from src.excel.query_sql.sql_recapAll import sql_recapAll
+
+# SHEET STOCK LIST #
+df_recapAll = pd.read_sql_query(sql_recapAll, db) #Read the sql query
+df_recapAll.index += 1 #Add index by 1
+
+#df_stock_list.to_excel(writer, sheet_name='STOCK LIST', startrow=4)
+df_recapAll.to_excel(writer, sheet_name='RECAP ALL', startrow=8, header=False, index=False, startcol=1)
+
+worksheet_recapAll = writer.sheets['RECAP ALL']
+worksheet_recapAll.set_tab_color('#7030A0')
+
+worksheet_recapAll.set_column(0, 0, 5)
+worksheet_recapAll.merge_range('A4:A6', 'No.', merge_format_number)
+
+# Merge necessary column
+worksheet_recapAll.merge_range('A1:S1', 'DAILY CONTAINER STOCK AND MOVEMENT REPORT', font_size_title)
+worksheet_recapAll.write('B2:B2', f'{date_now}', merge_info)
+worksheet_recapAll.merge_range('B4:B6', 'TYPE OF CONTAINERR', merge_info_center)
+worksheet_recapAll.merge_range('C4:J4', 'LAST DAY STOCK', merge_info_center)
+worksheet_recapAll.merge_range('K4:R4', 'TODAY MOVEMENT IN', merge_info_center)
+worksheet_recapAll.merge_range('S4:Z4', 'TODAY MOVEMENT OUT', merge_info_center)
+worksheet_recapAll.merge_range('AA4:AD4', 'TODAY', merge_info_center)
+worksheet_recapAll.merge_range('AE4:AL4', 'TODAY STOCK', merge_info_center)
+
+worksheet_recapAll.merge_range('C5:D5', "20'", merge_info_center)
+worksheet_recapAll.merge_range('E5:F5', "40'", merge_info_center)
+worksheet_recapAll.wmerge_range('G5:H5', "HC", merge_info_center)
+worksheet_recapAll.merge_range('I5:J5', "45 HC", merge_info_center)
+
+worksheet_recapAll.merge_range('K5:L5', "20'", merge_info_center)
+worksheet_recapAll.merge_range('M5:N5', "40'", merge_info_center)
+worksheet_recapAll.merge_range('O5:P5', "HC", merge_info_center)
+worksheet_recapAll.merge_range('Q5:R5', "45 HC", merge_info_center)
+
+worksheet_recapAll.merge_range('S5:T5', "20'", merge_info_center)
+worksheet_recapAll.merge_range('U5:V5', "40'", merge_info_center)
+worksheet_recapAll.merge_range('W5:X5', "HC", merge_info_center)
+worksheet_recapAll.merge_range('Y5:Z5', "45 HC", merge_info_center)
+
+worksheet_recapAll.merge_range('AA5:AD5', "REPAIR", merge_info_center)
+
+worksheet_recapAll.merge_range('AE5:AF5', "20'", merge_info_center)
+worksheet_recapAll.merge_range('AG5:AH5', "40'", merge_info_center)
+worksheet_recapAll.merge_range('AI5:AJ5', "HC", merge_info_center)
+worksheet_recapAll.merge_range('AK5:AL5', "45 HC", merge_info_center)
+
+
+worksheet_recapAll.write('C6:C6', 'AV', merge_info_center)
+worksheet_recapAll.write('D6:D6', 'DM', merge_info_center)
+worksheet_recapAll.write('E6:E6', 'AV', merge_info_center)
+worksheet_recapAll.write('F6:F6', 'DM', merge_info_center)
+worksheet_recapAll.write('G6:G6', 'AV', merge_info_center)
+worksheet_recapAll.write('H6:H6', 'DM', merge_info_center)
+worksheet_recapAll.write('I6:I6', 'AV', merge_info_center)
+worksheet_recapAll.write('J6:J6', 'DM', merge_info_center)
+
+worksheet_recapAll.write('K6:K6', 'AV', merge_info_center)
+worksheet_recapAll.write('L6:L6', 'DM', merge_info_center)
+worksheet_recapAll.write('M6:M6', 'AV', merge_info_center)
+worksheet_recapAll.write('N6:N6', 'DM', merge_info_center)
+worksheet_recapAll.write('O6:O6', 'AV', merge_info_center)
+worksheet_recapAll.write('P6:P6', 'DM', merge_info_center)
+worksheet_recapAll.write('Q6:Q6', 'AV', merge_info_center)
+worksheet_recapAll.write('R6:R6', 'DM', merge_info_center)
+
+worksheet_recapAll.write('S6:S6', 'AV', merge_info_center)
+worksheet_recapAll.write('T6:T6', 'DM', merge_info_center)
+worksheet_recapAll.write('U6:U6', 'AV', merge_info_center)
+worksheet_recapAll.write('V6:V6', 'DM', merge_info_center)
+worksheet_recapAll.write('W6:W6', 'AV', merge_info_center)
+worksheet_recapAll.write('X6:X6', 'DM', merge_info_center)
+worksheet_recapAll.write('Y6:Y6', 'AV', merge_info_center)
+worksheet_recapAll.write('Z6:Z6', 'DM', merge_info_center)
+
+worksheet_recapAll.merge_range('AA6:AA6', "20'", merge_info_center)
+worksheet_recapAll.merge_range('AB6:AB6', "40'", merge_info_center)
+worksheet_recapAll.merge_range('AC6:AC6', "HC", merge_info_center)
+worksheet_recapAll.merge_range('AD6:AD6', "45", merge_info_center)
+
+worksheet_recapAll.write('AE6:AE6', 'AV', merge_info_center)
+worksheet_recapAll.write('AF6:AF6', 'DM', merge_info_center)
+worksheet_recapAll.write('AG6:AG6', 'AV', merge_info_center)
+worksheet_recapAll.write('AH6:AH6', 'DM', merge_info_center)
+worksheet_recapAll.write('AI6:AI6', 'AV', merge_info_center)
+worksheet_recapAll.write('AJ6:AJ6', 'DM', merge_info_center)
+worksheet_recapAll.write('AK6:AK6', 'AV', merge_info_center)
+worksheet_recapAll.write('AL6:AL6', 'DM', merge_info_center)
+
+worksheet_recapAll.write('A7:A7', "1", merge_info)
+worksheet_recapAll.write('A8:A8', "2", merge_info)
+worksheet_recapAll.write('A9:A9', "3", merge_info)
+worksheet_recapAll.write('A10:A10', "4", merge_info)
+worksheet_recapAll.merge_range('A11:A12', "4", merge_info)
+
+worksheet_recapAll.write('A9:A9', "FR", merge_info)
+worksheet_recapAll.write('A10:A10', "GP", merge_info)
+worksheet_recapAll.write('A11:A11', "GOH", merge_info)
+worksheet_recapAll.write('A12:A12', "HC", merge_info)
+worksheet_recapAll.write('A13:A13', "OT", merge_info)
+worksheet_recapAll.write('A14:A14', "RF", merge_info)
+worksheet_recapAll.write('A15:A15', "RH", merge_info)
+worksheet_recapAll.write('A16:A16', "TOTAL", None)
+
+worksheet_recapAll.set_column('B:AK', None, align_center)
+
+'''
+dicts = ['B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+,'AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK']
+for dict in dicts:
+    worksheet.write(f"{dict}16", f"={dict}9+{dict}10+{dict}11+{dict}12+{dict}13+{dict}14+{dict}15",None)
+'''
+no_border_format = workbook.add_format({'bottom':0, 'top':0, 'left':0, 'right':0})
+worksheet_recapAll.conditional_format( 'A1:AK4' , { 'type' : 'no_errors' , 'format' : no_border_format} )
+
+border_format = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
+worksheet_recapAll.conditional_format( 'A5:AK16' , { 'type' : 'no_errors' , 'format' : border_format} )
+#worksheet_recapAll.set_column('A:Z', None, fmt)
+#worksheet_recapAll.set_row(0, None, fmt)

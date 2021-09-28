@@ -11,7 +11,7 @@ df_recapAll.to_excel(writer, sheet_name='RECAP ALL', startrow=8, header=False, i
 worksheet_recapAll = writer.sheets['RECAP ALL']
 worksheet_recapAll.set_tab_color('#7030A0')
 
-worksheet_recapAll.set_column(0, 0, 10)
+worksheet_recapAll.set_column(0, 0, 20)
 worksheet_recapAll.set_row(0, 26.25)
 
 # Merge necessary column
@@ -101,7 +101,19 @@ worksheet_recapAll.write('A12:A12', "HC", merge_info)
 worksheet_recapAll.write('A13:A13', "OT", merge_info)
 worksheet_recapAll.write('A14:A14', "RF", merge_info)
 worksheet_recapAll.write('A15:A15', "RH", merge_info)
-worksheet_recapAll.write('A16:A16', "TOTAL", None)
+worksheet_recapAll.write('A16:A16', "TOTAL (BOXES)", None)
+
+worksheet_recapAll.write('A17:A17', "TOTAL (TEUS)", None)
+
+
+#worksheet_recapAll.set_selection('B17:D17')
+'''
+worksheet_recapAll.write('E17:G17', "45'", merge_info_center)
+worksheet_recapAll.write('W17:Y17', "45'", merge_info_center)
+worksheet_recapAll.write('Z17:AB17', "45'", merge_info_center)
+worksheet_recapAll.write('AC17:AE17', "45'", merge_info_center)
+'''
+worksheet_recapAll.merge_range('B17:D17', """=SUM(C16+D16)*2+B16""")
 
 worksheet_recapAll.set_column('B:AK', None, align_center)
 
@@ -115,6 +127,6 @@ no_border_format = workbook.add_format({'bottom':0, 'top':0, 'left':0, 'right':0
 worksheet_recapAll.conditional_format( 'A1:AK4' , { 'type' : 'no_errors' , 'format' : no_border_format} )
 
 border_format = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
-worksheet_recapAll.conditional_format( 'A5:AK16' , { 'type' : 'no_errors' , 'format' : border_format} )
+worksheet_recapAll.conditional_format( 'A5:AK17' , { 'type' : 'no_errors' , 'format' : border_format} )
 #worksheet_recapAll.set_column('A:Z', None, fmt)
 #worksheet_recapAll.set_row(0, None, fmt)

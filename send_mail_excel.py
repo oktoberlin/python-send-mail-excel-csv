@@ -9,7 +9,7 @@ from src.excel.save import *
 import logging
 
 def mysql_to_excel():
-    '''
+    
     logging.info('ready to send mail')
     fromaddr = "report@autodkms.com"
     toaddr=['oktoberlin@gmail.com']
@@ -29,7 +29,7 @@ def mysql_to_excel():
     filename = excel_filename
     attachment = open(filename, "rb")
 
-    part = MIMEBase('application','octet-stream')
+    part = MIMEBase('application','vnd.ms-excel')
     part.set_payload((attachment).read())
     encoders.encode_base64(part)
     part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
@@ -67,6 +67,6 @@ def mysql_to_excel():
         else:
             logging.warning(error_code+": "+error_message)
         
-    '''
+    
 
 if __name__ == '__main__':mysql_to_excel()
