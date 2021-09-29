@@ -149,14 +149,14 @@ worksheet_recapAll.write('A16:A16', "TOTAL (BOXES)", None)
 
 worksheet_recapAll.write('A17:A17', "TOTAL (TEUS)", None)
 
-worksheet_recapAll.merge_range('AC19:AD19', "Capasity Depo", merge_info_center)
+worksheet_recapAll.merge_range('AC19:AD19', "Capacity Depo", merge_info_center)
 worksheet_recapAll.write('AE19:AE19', "1.500", merge_info_center)
 worksheet_recapAll.write('AF19:AF19', "teus", align_leftBold)
 
-worksheet_recapAll.merge_range('AC20:AD20', "Capasity Used", merge_info_center)
+worksheet_recapAll.merge_range('AC20:AD20', "Capacity Used", merge_info_center)
 worksheet_recapAll.write('AG20:AG20', "teus", align_leftBold)
 
-worksheet_recapAll.merge_range('AC21:AD21', "Free Capasity", merge_info_center)
+worksheet_recapAll.merge_range('AC21:AD21', "Free Capacity", merge_info_center)
 worksheet_recapAll.write('AG21:AG21', "teus", align_leftBold)
 
 worksheet_recapAll.write('AG22:AG22', "boxes", align_leftBold)
