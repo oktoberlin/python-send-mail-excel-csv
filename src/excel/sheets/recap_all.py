@@ -1,5 +1,5 @@
 from src.excel.excel_format import *
-from src.excel.query_sql.sql_recapAll import *
+from src.excel.query_sql.sql_recapAll2 import *
 
 # SHEET STOCK LIST #
 df_recapAll = pd.read_sql_query(sql_recapAll, db) #Read the sql query
@@ -44,9 +44,17 @@ df_recapAll_avStockList.to_excel(writer, sheet_name='RECAP ALL', index=False, he
 df_recapAll_dmgStockList = pd.read_sql_query(sql_recapAll_dmgStockList, db)
 df_recapAll_dmgStockList.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 8,startcol=34)
 
+
+df_recapAll_stockListSummary = pd.read_sql_query(sql_recapAll_stockListSummary, db)
+df_recapAll_stockListSummary.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 11,startcol=30)
+
+
+df_recapAll_stockListBoxes = pd.read_sql_query(sql_recapAll_stockListBoxes, db)
+df_recapAll_stockListBoxes.to_excel(writer, sheet_name='RECAP ALL', index=False, header=False, startrow=df_recapAll.shape[0] + 13,startcol=31)
+
 worksheet_recapAll = writer.sheets['RECAP ALL']
 worksheet_recapAll.set_tab_color('#7030A0')
-
+worksheet_recapAll.protect()
 worksheet_recapAll.set_column(0, 0, 20)
 worksheet_recapAll.set_row(0, 26.25)
 
@@ -141,9 +149,40 @@ worksheet_recapAll.write('A16:A16', "TOTAL (BOXES)", None)
 
 worksheet_recapAll.write('A17:A17', "TOTAL (TEUS)", None)
 
+worksheet_recapAll.merge_range('AC19:AD19', "Capasity Depo", merge_info_center)
+worksheet_recapAll.write('AE19:AE19', "1.500", merge_info_center)
+worksheet_recapAll.write('AF19:AF19', "teus", align_leftBold)
+
+worksheet_recapAll.merge_range('AC20:AD20', "Capasity Used", merge_info_center)
+worksheet_recapAll.write('AG20:AG20', "teus", align_leftBold)
+
+worksheet_recapAll.merge_range('AC21:AD21', "Free Capasity", merge_info_center)
+worksheet_recapAll.write('AG21:AG21', "teus", align_leftBold)
+
+worksheet_recapAll.write('AG22:AG22', "boxes", align_leftBold)
+
+worksheet_recapAll.conditional_format('AE21:AE21',
+                                    {
+                                    'type': 'no_errors',
+                                    'format': percent_fmt,  
+                                    })
+worksheet_recapAll.conditional_format('AE20:AE20',
+                                    {
+                                    'type': 'no_errors',
+                                    'format': percent_fmt,  
+                                    })
+#worksheet_recapAll.set_column('AE:AE',None,percent_fmt)
+worksheet_recapAll.write('AE20:AE20', df_recapAll_stockListSummary.iloc[0,0], merge_info_center)
+worksheet_recapAll.write('AE21:AE21', df_recapAll_stockListSummary.iloc[1,0], merge_info_center)
+#worksheet_recapAll.set_column('AE21:AE21',None,percent_fmt)
+
+'''
+worksheet_recapAll.write(11,30, df_recapAll_stockListSummary.iloc[0,0], merge_info_center)
+#worksheet_recapAll.write('AE21:AE21', df_recapAll_stockListSummary.iloc[1,1], merge_info_center)
+
 
 #worksheet_recapAll.set_selection('B17:D17')
-'''
+
 worksheet_recapAll.write('E17:G17', "45'", merge_info_center)
 worksheet_recapAll.write('W17:Y17', "45'", merge_info_center)
 worksheet_recapAll.write('Z17:AB17', "45'", merge_info_center)
@@ -177,5 +216,10 @@ worksheet_recapAll.conditional_format( 'A1:AK4' , { 'type' : 'no_errors' , 'form
 
 border_format = workbook.add_format({'bottom':1, 'top':1, 'left':1, 'right':1})
 worksheet_recapAll.conditional_format( 'A5:AK17' , { 'type' : 'no_errors' , 'format' : border_format} )
+
+worksheet_recapAll.conditional_format( 'AC19:AE21' , { 'type' : 'no_errors' , 'format' : border_format} )
+worksheet_recapAll.conditional_format( 'AF20:AF22' , { 'type' : 'no_errors' , 'format' : border_format} )
+
+
 #worksheet_recapAll.set_column('A:Z', None, fmt)
 #worksheet_recapAll.set_row(0, None, fmt)

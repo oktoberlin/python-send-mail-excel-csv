@@ -14,7 +14,7 @@ left Join interchangeDocpaycontainer on InterchangeDocpaycontainer.contno = eiri
 AND InterchangeDocpaycontainer.intno=EIRIN.intNo 
 left Join interchangeDocpaydetails on InterchangeDocpaydetails.nomor = InterchangeDocpaycontainer.nomor 
 AND InterchangeDocpaydetails.Size = ContainerDetails.Size 
-where EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+where EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 GROUP BY EIRIN.NOMOR order by EIRIN.DateIn"""
 
@@ -25,8 +25,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '20' AND ContainerDetails.type = 'GP' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -35,8 +36,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '20' AND ContainerDetails.type = 'HC' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -45,8 +47,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '20' AND ContainerDetails.type = 'OT' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -55,8 +58,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '20' AND ContainerDetails.type = 'FR' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -65,8 +69,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '20' AND ContainerDetails.type = 'RF' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -75,8 +80,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '20' AND ContainerDetails.type = 'TK' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -85,8 +91,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'GP' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -95,8 +102,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'HC' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -105,8 +113,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'OT' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -115,8 +124,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'FR' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -125,8 +135,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'RF' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -135,8 +146,9 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'RH' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 UNION ALL 
 SELECT 
@@ -145,7 +157,8 @@ COUNT(CASE WHEN EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS DMG,
 COUNT(CASE WHEN EIRIN.contCondition LIKE 'AV%' OR EIRIN.contCondition LIKE 'DM%' THEN 1 END) AS TOTAL 
 FROM EIRIN 
 Left join ContainerDetails On ContainerDetails.ContNo = EIRIN.ContNo 
+left Join Interchange On Interchange.Nomor = EIRIN.IntNo 
 where ContainerDetails.size = '40' AND ContainerDetails.type = 'HT' 
-AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' 
+AND EIRIN.PrincipleCode = '"""+Principle_Code+"""' AND interchange.ExRepo=1 
 AND EIRIN.DateIn >= '"""+time_from+"""' AND EIRIN.DateIn <= '"""+time_now+"""' 
 """

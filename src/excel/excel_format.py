@@ -4,7 +4,7 @@ from src.excel.time import time_yesterday, time_now,time_now_filename,date_now
 from src.database.database import db
 import logging
 
-time_from = '2021-09-24 10:48:00'                                  
+time_from = '2021-08-24 10:48:00'                                  
 
 logging.basicConfig(filename=f'logs/excel/excel_{time_now_filename}.log',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',level=logging.DEBUG)
 logging.info("Export Excel Begin")
@@ -24,7 +24,7 @@ writer = pd.ExcelWriter(excel_filename, engine='xlsxwriter')
 
 # Formatting Excel File
 workbook = writer.book
-workbook.set_calc_mode('auto')
+#workbook.set_calc_mode('auto')
 #workbook.formats[0].set_font_size(10)
 #workbook.formats[1].set_font_size(10)
 #workbook.formats[0].set_font_name('Arial Narrow')
@@ -70,6 +70,13 @@ align_left = workbook.add_format({
 align_left.set_align('left')
 align_left.set_align('vcenter')
 
+align_leftBold = workbook.add_format({
+    'text_wrap': True,
+    'bold': True
+})
+align_leftBold.set_align('left')
+align_leftBold.set_align('vcenter')
+
 font_size_title = workbook.add_format({
     'font_size':12,
     'bold':True,
@@ -80,3 +87,5 @@ header_format = workbook.add_format({
     #'bold': True,
     'text_wrap': True,
     'valign': 'vcenter',})
+
+percent_fmt = workbook.add_format({'num_format': '0%'})
