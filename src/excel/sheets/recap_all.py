@@ -1,5 +1,5 @@
 from src.excel.excel_format import *
-from src.excel.query_sql.sql_recapAll2 import *
+from src.excel.query_sql.sql_recapAll import *
 
 # SHEET STOCK LIST #
 df_recapAll = pd.read_sql_query(sql_recapAll, db) #Read the sql query
@@ -160,7 +160,7 @@ worksheet_recapAll.merge_range('AC21:AD21', "Free Capasity", merge_info_center)
 worksheet_recapAll.write('AG21:AG21', "teus", align_leftBold)
 
 worksheet_recapAll.write('AG22:AG22', "boxes", align_leftBold)
-
+'''
 worksheet_recapAll.conditional_format('AE21:AE21',
                                     {
                                     'type': 'no_errors',
@@ -174,6 +174,7 @@ worksheet_recapAll.conditional_format('AE20:AE20',
 #worksheet_recapAll.set_column('AE:AE',None,percent_fmt)
 worksheet_recapAll.write('AE20:AE20', df_recapAll_stockListSummary.iloc[0,0], merge_info_center)
 worksheet_recapAll.write('AE21:AE21', df_recapAll_stockListSummary.iloc[1,0], merge_info_center)
+'''
 #worksheet_recapAll.set_column('AE21:AE21',None,percent_fmt)
 
 '''

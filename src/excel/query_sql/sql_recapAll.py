@@ -1889,9 +1889,9 @@ AND EI.DateIn <= '"""+time_now+"""'
 sql_recapAll_stockListSummary = """
 SELECT * FROM 
 (SELECT 
-left(concat(round((COUNT(CASE WHEN CD.size = '20' THEN 1 END)+
+concat(FORMAT((COUNT(CASE WHEN CD.size = '20' THEN 1 END)+
 (COUNT(CASE WHEN CD.size = '40' THEN 1 END)+
-COUNT(CASE WHEN CD.size = '45' THEN 1 END))*2)/1500*100,0),'%'),3) as a   
+COUNT(CASE WHEN CD.size = '45' THEN 1 END))*2)/1500*100,0),'%') as a   
 FROM ContainerStock CS 
 Left join ContainerDetails CD On CD.ContNo = CS.ContNo 
 Left Join EIRIN EI On EI.Nomor = CS.EIRNo 
@@ -1914,7 +1914,7 @@ AND EI.DateIn <= '"""+time_now+"""'
 UNION ALL 
 SELECT * FROM 
 (SELECT 
-concat(round((1500-(COUNT(CASE WHEN CD.size = '20' THEN 1 END)+
+concat(FORMAT((1500-(COUNT(CASE WHEN CD.size = '20' THEN 1 END)+
 (COUNT(CASE WHEN CD.size = '40' THEN 1 END)+
 COUNT(CASE WHEN CD.size = '45' THEN 1 END))*2))/1500*100,0),'%')  
 FROM ContainerStock CS 
